@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>こくん堂 / Cokundo - スマートフォンアプリの開発・運営</title>
-<meta name="description" content="こくん堂（Cokundo）は、スマートフォンアプリの開発・運営を行う個人事業です。自分の写真からカードを作れるオラクルカードアプリ「Oracle Forge」を運営しています。" />
+<meta name="description" content="こくん堂（Cokundo）は、スマートフォンアプリの開発・運営を行う個人事業です。自分の写真からカードを作れるオラクルカードアプリ「Oracle Forge」を運営。日記の気持ちが結晶になる「こころ結晶る。」を近日公開予定です。" />
 <link rel="icon" href="assets/brand/cokundo-badge.png" type="image/png" />
 <link rel="stylesheet" href="colors_and_type.css" />
 <style>
@@ -241,6 +241,68 @@
     padding: 5px 11px;
   }
 
+  /* 公開前のアプリ。出ているアプリと同じ重さで並べると
+     「もう遊べる」と誤解されるので、一段静かに置く。 */
+  .app-upcoming {
+    margin-top: 56px;
+    padding-top: 36px;
+    border-top: 1px solid var(--line-soft);
+    display: grid;
+    grid-template-columns: 112px 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .app-upcoming .icon img {
+    width: 100%;
+    display: block;
+    border-radius: 22%;
+    filter: drop-shadow(0 14px 30px rgba(0,0,0,0.5));
+  }
+  .app-upcoming .badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    color: var(--c-kogane);
+    border: 1px solid var(--line-soft);
+    border-radius: 2px;
+    padding: 4px 10px;
+  }
+  .app-upcoming h3 {
+    font-family: var(--font-mincho);
+    font-weight: 400;
+    font-size: 24px;
+    letter-spacing: 0.06em;
+    color: var(--c-silk);
+    margin: 14px 0 0;
+  }
+  .app-upcoming .platform {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--c-kinari-dim);
+    margin-top: 8px;
+    display: block;
+  }
+  .app-upcoming p {
+    font-family: var(--font-sans-jp);
+    font-size: 14px;
+    line-height: 2;
+    color: var(--c-silk-soft);
+    margin: 16px 0 0;
+    letter-spacing: 0.03em;
+  }
+  .app-upcoming .features { margin: 18px 0 0; display: flex; gap: 8px; flex-wrap: wrap; }
+  .app-upcoming .features span {
+    font-family: var(--font-sans-jp);
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    color: var(--c-silk-soft);
+    border: 1px solid var(--line-soft);
+    border-radius: 2px;
+    padding: 5px 11px;
+  }
+
   .shots {
     margin-top: 40px;
     display: grid;
@@ -336,6 +398,7 @@
     .app-hero .box { max-width: 200px; }
     dl.contact > div { grid-template-columns: 1fr; gap: 4px; }
     .shots { max-width: 100%; }
+    .app-upcoming { grid-template-columns: 92px 1fr; gap: 20px; }
   }
 </style>
 </head>
@@ -432,6 +495,24 @@
         </div>
       </div>
       <p class="shots-note">※ 実際のアプリ画面（指でカードを混ぜる / カード箱を選ぶ）です。</p>
+
+      <div class="app-upcoming">
+        <div class="icon">
+          <img src="assets/products/kokoro-crystal-icon.png" alt="こころ結晶る。" />
+        </div>
+        <div class="meta">
+          <span class="badge">COMING SOON</span>
+          <h3>こころ結晶る。</h3>
+          <span class="platform">Android / 近日公開</span>
+          <p>その日の気持ちを、ひとこと日記に書く。言葉は、色と形のちがう結晶になって、室礼の間に生えてきます。結晶は好きなように手放せます。叩いて割る、囲炉裏で燃やす、棚に残してときどき眺める。凪の浜の波に磨かせると、角のとれた硝子になって浜に残り、拾って帰れば窓辺に並びます。</p>
+          <div class="features">
+            <span>ひとこと日記</span>
+            <span>気持ちが結晶になる</span>
+            <span>手放し方を選ぶ</span>
+            <span>九つの月と五つの相</span>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="block">
