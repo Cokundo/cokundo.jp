@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="ja" data-screen-label="こくん堂 開発メモ">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>開発メモ | こくん堂 / Cokundo</title>
+<meta name="description" content="こくん堂（Cokundo）の開発メモ。アプリづくりの記録を、ここに少しずつ貼っていきます。現在準備中です。" />
+<link rel="icon" href="../assets/brand/cokundo-badge.png" type="image/png" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--c-sumi);
+    color: var(--c-silk);
+    font-family: var(--font-sans-jp);
+    font-feature-settings: "palt" 1;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    background-image: url("../assets/textures/grain.svg");
+    background-size: 240px 240px;
+    opacity: 0.5;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  :root {
+    --paper: #f3eee2;
+    --paper-2: #e9e3d4;
+    --paper-blue: #dde3ea;
+    --paper-lilac: #e4dfec;
+    --ink: #2a2723;
+    --ink-soft: rgba(42, 39, 35, 0.62);
+    --rule: rgba(64, 86, 120, 0.16);
+  }
+
+  .wrap { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 0 40px; }
+
+  header.top {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 36px 0 0;
+  }
+  header.top a.home {
+    display: flex; align-items: center; gap: 12px;
+    text-decoration: none; color: var(--c-silk);
+  }
+  header.top a.home img {
+    width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
+    box-shadow: 0 0 0 1px rgba(201,154,60,0.5), 0 0 16px rgba(201,154,60,0.22);
+  }
+  header.top a.home span {
+    font-family: var(--font-mincho);
+    font-size: 17px; letter-spacing: 0.16em;
+  }
+  header.top a.back {
+    font-size: 12px; letter-spacing: 0.08em;
+    color: var(--c-silk-soft);
+    border: 1px solid var(--line-soft); border-radius: 2px;
+    padding: 7px 13px; text-decoration: none; white-space: nowrap;
+    transition: border-color var(--dur-base) var(--ease-shrine), color var(--dur-base) var(--ease-shrine);
+  }
+  header.top a.back:hover { border-color: var(--c-wakakusa); color: var(--c-kessho); }
+
+  .title { padding: 64px 0 8px; }
+  .eyebrow {
+    font-family: var(--font-serif-en);
+    font-size: 10.5px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--c-kogane);
+    display: flex; align-items: center; gap: 16px;
+    margin: 0 0 22px;
+  }
+  .eyebrow::after { content: ""; flex: 1; border-top: 1px solid var(--line-soft); }
+  h1 {
+    margin: 0;
+    font-family: var(--font-mincho); font-weight: 400;
+    font-size: 34px; letter-spacing: 0.16em;
+  }
+  .title p {
+    margin: 16px 0 0;
+    font-size: 14px; line-height: 2; letter-spacing: 0.03em;
+    color: var(--c-silk-soft);
+  }
+
+  /* ---- board ---- */
+  .board {
+    position: relative;
+    margin: 40px 0 0;
+    padding: 56px 36px 64px;
+    border: 1px solid var(--line-soft);
+    border-radius: 4px;
+    background:
+      radial-gradient(120% 90% at 30% 0%, rgba(201,154,60,0.07), transparent 60%),
+      linear-gradient(180deg, #161816, #10110f);
+    box-shadow: inset 0 0 60px rgba(0,0,0,0.55);
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 44px 40px;
+    align-items: start;
+  }
+
+  .memo {
+    position: relative;
+    color: var(--ink);
+    background: var(--paper);
+    padding: 34px 28px 28px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.4) inset,
+      0 14px 28px rgba(0,0,0,0.45),
+      0 3px 6px rgba(0,0,0,0.35);
+    transform: rotate(var(--rot, 0deg));
+    transition: transform 320ms var(--ease-shrine), box-shadow 320ms var(--ease-shrine);
+  }
+  .memo:hover {
+    transform: rotate(calc(var(--rot, 0deg) * 0.4)) translateY(-3px);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.4) inset, 0 22px 38px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3);
+  }
+  /* curled bottom corner */
+  .memo::after {
+    content: ""; position: absolute; right: 0; bottom: 0;
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.08) 50%, rgba(255,255,255,0.35) 100%);
+  }
+
+  /* push pin */
+  .pin {
+    position: absolute; top: -9px; left: 50%;
+    width: 20px; height: 20px; margin-left: -10px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff3cf 0%, var(--c-kogane-pale) 22%, var(--c-kogane) 58%, #7a5a1c 100%);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5), 3px 7px 8px rgba(0,0,0,0.25);
+    z-index: 2;
+  }
+  .pin.blue { background: radial-gradient(circle at 35% 30%, #ffffff 0%, #c7d3e3 24%, #5f7593 62%, #2a3850 100%); }
+  .pin.lilac { background: radial-gradient(circle at 35% 30%, #ffffff 0%, #ddd3ee 24%, #8e7fb0 62%, #4b3f68 100%); }
+
+  /* washi tape */
+  .tape {
+    position: absolute; top: -12px; left: 50%;
+    width: 96px; height: 26px; margin-left: -48px;
+    background: repeating-linear-gradient(45deg, rgba(223,247,255,0.55) 0 6px, rgba(200,214,232,0.55) 6px 12px);
+    transform: rotate(-3deg);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    z-index: 2;
+  }
+
+  /* main memo: ruled paper */
+  .memo.main {
+    --rot: -1.4deg;
+    grid-row: 1 / span 2;
+    padding: 46px 34px 40px 52px;
+    background:
+      linear-gradient(90deg, transparent 36px, rgba(190,90,90,0.28) 36px, rgba(190,90,90,0.28) 37px, transparent 37px),
+      repeating-linear-gradient(180deg, transparent 0 31px, var(--rule) 31px 32px),
+      var(--paper);
+    background-position: 0 0, 0 14px, 0 0;
+  }
+  .memo.main .date {
+    font-family: var(--font-mono);
+    font-size: 11px; letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    line-height: 32px;
+  }
+  .memo.main h2 {
+    margin: 0;
+    font-family: var(--font-serif-en); font-style: italic; font-weight: 400;
+    font-size: 40px; letter-spacing: 0.04em;
+    line-height: 64px;
+    color: #1f2a3c;
+  }
+  .memo.main .jp {
+    font-family: var(--font-mincho);
+    font-size: 17px; letter-spacing: 0.12em;
+    line-height: 32px;
+    margin: 0;
+  }
+  .memo.main p.note {
+    margin: 0;
+    font-family: var(--font-mincho);
+    font-size: 14.5px; letter-spacing: 0.05em;
+    line-height: 32px;
+    color: var(--ink-soft);
+  }
+  .memo.main .sign {
+    margin: 32px 0 0;
+    text-align: right;
+    font-family: var(--font-mincho);
+    font-size: 13px; letter-spacing: 0.14em;
+    line-height: 32px;
+    color: var(--ink-soft);
+  }
+  .memo.main .stamp {
+    position: absolute; right: 26px; top: 34px;
+    width: 64px; height: 64px;
+    border: 1.5px solid rgba(178,70,60,0.62);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    font-family: var(--font-mincho);
+    font-size: 11px; line-height: 1.35; letter-spacing: 0.1em;
+    color: rgba(178,70,60,0.72);
+    transform: rotate(12deg);
+  }
+
+  /* small memos */
+  .memo.todo {
+    --rot: 2.2deg;
+    background: var(--paper-blue);
+    max-width: 300px;
+  }
+  .memo.todo h3, .memo.idea h3 {
+    margin: 0 0 14px;
+    font-family: var(--font-serif-en);
+    font-size: 10.5px; letter-spacing: 0.28em; text-transform: uppercase;
+    color: #4a5c78;
+    font-weight: 400;
+  }
+  .memo.todo ul { list-style: none; margin: 0; padding: 0; }
+  .memo.todo li {
+    display: flex; gap: 10px; align-items: baseline;
+    font-family: var(--font-mincho);
+    font-size: 14px; letter-spacing: 0.05em;
+    line-height: 1.95;
+  }
+  .memo.todo li .box {
+    flex: 0 0 auto;
+    width: 11px; height: 11px;
+    border: 1px solid rgba(42,39,35,0.5);
+    transform: translateY(1px);
+    position: relative;
+  }
+  .memo.todo li.done .box::after {
+    content: ""; position: absolute; left: 2px; top: -3px;
+    width: 5px; height: 10px;
+    border: solid #3f6c4a; border-width: 0 1.6px 1.6px 0;
+    transform: rotate(40deg);
+  }
+  .memo.todo li.done span.t { text-decoration: line-through; text-decoration-color: rgba(42,39,35,0.45); color: var(--ink-soft); }
+
+  .memo.idea {
+    --rot: -2.6deg;
+    background: var(--paper-lilac);
+    max-width: 260px;
+    justify-self: end;
+    padding-top: 30px;
+  }
+  .memo.idea p {
+    margin: 0;
+    font-family: var(--font-mincho);
+    font-size: 14px; line-height: 1.95; letter-spacing: 0.06em;
+  }
+  .memo.idea p .soft { color: var(--ink-soft); }
+  .memo.idea svg { display: block; width: 26px; height: 26px; color: #6d5f92; margin: 0 0 10px; }
+
+  footer.colophon {
+    padding: 64px 0 90px;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px; letter-spacing: 0.06em;
+    color: var(--c-kinari-dim);
+  }
+  footer.colophon a { color: var(--c-kinari-dim); text-decoration: none; border-bottom: 1px solid var(--line-soft); }
+  footer.colophon a:hover { color: var(--c-kessho); border-color: var(--c-wakakusa); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .memo, .memo:hover { transition: none; }
+  }
+
+  @media (max-width: 720px) {
+    .wrap { padding: 0 16px; }
+    header.top { padding-top: 24px; }
+    header.top a.home span { font-size: 15px; }
+    .title { padding-top: 44px; }
+    h1 { font-size: 27px; }
+    .board {
+      grid-template-columns: 1fr;
+      padding: 40px 18px 44px;
+      gap: 40px;
+    }
+    .memo.main { grid-row: auto; padding: 42px 22px 34px 46px; background-position: 0 0, 0 10px, 0 0; }
+    .memo.main { background:
+      linear-gradient(90deg, transparent 32px, rgba(190,90,90,0.28) 32px, rgba(190,90,90,0.28) 33px, transparent 33px),
+      repeating-linear-gradient(180deg, transparent 0 31px, var(--rule) 31px 32px),
+      var(--paper); }
+    .memo.main h2 { font-size: 32px; }
+    .memo.main .stamp { width: 54px; height: 54px; font-size: 10px; right: 16px; top: 26px; }
+    .memo.todo, .memo.idea { max-width: none; justify-self: stretch; }
+    .memo.todo { margin: 0 8px; }
+    .memo.idea { margin: 0 14px 0 4px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header class="top">
+      <a class="home" href="../">
+        <img src="../assets/brand/cokundo-badge.png" alt="" />
+        <span>こくん堂</span>
+      </a>
+      <a class="back" href="../">トップへ戻る</a>
+    </header>
+
+    <section class="title">
+      <p class="eyebrow">Dev Notes</p>
+      <h1>開発メモ</h1>
+      <p>アプリづくりの途中で書きとめたことを、ここに少しずつ貼っていきます。</p>
+    </section>
+
+    <section class="board" aria-label="開発メモの掲示板">
+
+      <article class="memo main">
+        <span class="pin" aria-hidden="true"></span>
+        <div class="stamp" aria-hidden="true">準備<br />中</div>
+        <div class="date">2026.11 —</div>
+        <h2>Coming Soon</h2>
+        <p class="jp">ただいま準備中です。</p>
+        <p class="note">
+          制作の記録、試したこと、うまくいかなかったこと。そういう小さな走り書きを、この板にそっと留めていく予定です。
+        </p>
+        <p class="sign">― こくん堂</p>
+      </article>
+
+      <aside class="memo todo" aria-label="やること">
+        <span class="tape" aria-hidden="true"></span>
+        <h3>To Do</h3>
+        <ul>
+          <li class="done"><span class="box"></span><span class="t">ページをつくる</span></li>
+          <li><span class="box"></span><span class="t">最初のメモを書く</span></li>
+          <li><span class="box"></span><span class="t">Oracle Forge の制作記</span></li>
+        </ul>
+      </aside>
+
+      <aside class="memo idea" aria-label="ひとこと">
+        <span class="pin lilac" aria-hidden="true"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.9" aria-hidden="true">
+          <path d="M9 3 L15 3 L15 6 L9 6 Z"></path>
+          <path d="M7 6 L17 6 L16 18 L8 18 Z"></path>
+          <path d="M10 18 L10 21 L14 21 L14 18"></path>
+          <circle cx="12" cy="12" r="2" stroke-opacity="0.5"></circle>
+        </svg>
+        <p>灯りはともしてあります。<br /><span class="soft">もう少しだけ、<span style="white-space:nowrap">お待ちください。</span></span></p>
+      </aside>
+
+    </section>
+
+    <footer class="colophon">
+      <span>こくん堂 - Cokundo</span>
+      <a href="../">トップページへ</a>
+    </footer>
+
+  </div>
+</body>
+</html>
